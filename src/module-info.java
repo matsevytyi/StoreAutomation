@@ -6,8 +6,11 @@ module StoreAutomation {
     requires org.json;
     requires jjwt.api;
     requires java.sql;
+    requires java.net.http;
 
-    exports client.APP;
+    exports client.app;
 
-    opens client.APP to javafx.fxml;
+    opens client.app to javafx.fxml;
+    exports client.api;
+    opens client.api to javafx.fxml;
 }

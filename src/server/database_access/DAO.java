@@ -8,16 +8,27 @@ import java.sql.SQLException;
 
 public interface DAO {
 
+    //User authentication
+    static String validateUser(String username, String hashed_password) {
+        return "SELECT 1 FROM public.lgin_data WHERE username = '" + username + "' and hashed_password = '" + hashed_password + "'";
+    }
+
+    //Items operations
     public static String deleteItem(String id) {
         return "DELETE FROM public.items WHERE id = '" + id + "'";
     }
 
-    public static String searchItem(String name, int category_id) {
-        return "SELECT id, name, group_id FROM public.items WHERE name LIKE '%" + name + "%' and group_id = '" + category_id + "'";
+    public static String searchItem(String name, Integer category_id) {
+        StringBuilder query = new StringBuilder("SELECT id, name, group_id FROM public.items WHERE name LIKE ?");
+
+        if (category_id != null) {
+            query.append(" AND group_id = ?");
+        }
+
+        return query.toString();
     }
 
     public static String createItem(String name, String description, String manufacturer, double price_per_unit, int group_id) {
-        System.out.println("DAO");
         return "INSERT INTO public.items (name, description, manufacturer, price_per_unit, group_id) VALUES ('" + name + "', '" + description + "', '" + manufacturer + "', '" + price_per_unit + "', '" + group_id + "');";
     }
 
@@ -30,13 +41,43 @@ public interface DAO {
     }
 
     public static String filterByPrice(double minPrice, double maxPrice, int group_id) {
-        return "SELECT id, name, group_id FROM public.items WHERE price_per_unit > '" + minPrice + "' AND price_per_unit < '" + maxPrice + "' AND group_id = '" + group_id + "'";
+        return "SELECT id, name, group_id FROM public.items WHERE price_per_unit >= '" + minPrice + "' AND price_per_unit <= '" + maxPrice + "' AND group_id = '" + group_id + "'";
     }
 
-    static String validateUser(String username, String hashed_password) {
-        return "SELECT 1 FROM public.lgin_data WHERE username = '" + username + "' and hashed_password = '" + hashed_password + "'";
+    static String lockItem(String id) {
+        return "SELECT quantity_in_stock FROM items WHERE id = '" + id + "' FOR UPDATE";
     }
 
+    static String alterQuantity(String id, int quantity) {
+        return "UPDATE public.items SET quantity_in_stock = quantity_in_stock + " + quantity + " WHERE id = '" + id + "'";
+    }
+
+    //Categories operations
+    public static String getCategoriesList() {
+        return "SELECT * FROM public.categories";
+    }
+
+    public static String getCategory(String id) {
+        return "SELECT * FROM public.categories WHERE id = '" + id + "'";
+    }
+
+    public static String updateCategory(String id, String name, String description) {
+        return "UPDATE public.categories SET name = '" + name + "', description = '" + description + "' WHERE id = '" + id + "'";
+    }
+
+    public static String createCategory(String name, String description) {
+        return "INSERT INTO public.categories (name, description) VALUES ('" + name + "', '" + description + "');";
+    }
+
+
+    public static String deleteCategory(String id) {
+        return "DELETE FROM public.categories WHERE id = '" + id + "'";
+    }
+
+
+
+
+    // unpack items operations
     static JSONObject unpackItem(ResultSet resultSet) throws SQLException {
         if (resultSet.next()) {
             JSONObject itemJson = new JSONObject();
@@ -70,6 +111,37 @@ public interface DAO {
             e.printStackTrace();
         }
 
+        return jsonArray;
+    }
+
+    //unpack categories operations
+
+    static JSONObject unpackCategory(ResultSet resultSet) throws SQLException {
+        if (resultSet.next()) {
+            JSONObject categoryJson = new JSONObject();
+            categoryJson.put("id", resultSet.getInt(1));
+            categoryJson.put("name", resultSet.getString(2));
+            categoryJson.put("description", resultSet.getString(3));
+            return categoryJson;
+        } else {
+            return null; // No category found
+        }
+    }
+
+    public static JSONArray unpackCategoryList(ResultSet resultSet) {
+        JSONArray jsonArray = new JSONArray();
+
+        try {
+            while (resultSet.next()) {
+                JSONObject jsonCategory = new JSONObject();
+                jsonCategory.put("id", resultSet.getInt("id"));
+                jsonCategory.put("name", resultSet.getString("name"));
+                jsonCategory.put("description", resultSet.getString("description"));
+                jsonArray.put(jsonCategory);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return jsonArray;
     }
 }

@@ -15,9 +15,12 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Base64;
+import java.util.Collection;
 
 public class ItemsHandler implements HttpHandler {
 
@@ -28,13 +31,13 @@ public class ItemsHandler implements HttpHandler {
 
         if (token == null) {
             System.out.println("No token provided");
-            exchange.sendResponseHeaders(403, -1);
+            exchange.sendResponseHeaders(401, -1);
             return;
         }
 
         if (!isTokenValid(token)) {
             System.out.println("Invalid token: " + token);
-            exchange.sendResponseHeaders(403, -1);
+            exchange.sendResponseHeaders(401, -1);
             return;
         }
 
@@ -62,7 +65,10 @@ public class ItemsHandler implements HttpHandler {
                 break;
             case "POST":
                 System.out.println("POST " + id);
-                handlePost(exchange, id);
+                if(path.contains("altquantity"))
+                    handleAlterQuantity(exchange, id);
+                else
+                    handlePost(exchange, id);
                 break;
             case "DELETE":
                 System.out.println("DELETE " + id);
@@ -160,11 +166,7 @@ public class ItemsHandler implements HttpHandler {
         String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
         JSONObject json = new JSONObject(body);
 
-        System.out.println('A');
-
         if (json.has("name") && json.has("description") && json.has("manufacturer") && json.has("price_per_unit") && json.has("group_id")) {
-
-            System.out.println('B');
 
             double price = json.getDouble("price_per_unit");
 
@@ -172,8 +174,6 @@ public class ItemsHandler implements HttpHandler {
                 exchange.sendResponseHeaders(409, -1); // Conflict
                 return;
             }
-
-            System.out.println('C');
 
             try {
 
@@ -194,7 +194,6 @@ public class ItemsHandler implements HttpHandler {
                         .prepareStatement(query)
                         .executeUpdate();
 
-                System.out.println(resultSet);
 
                 if (resultSet > 0) {
                     exchange.getResponseHeaders().set("Content-Type", "application/json");
@@ -262,6 +261,74 @@ public class ItemsHandler implements HttpHandler {
             exchange.sendResponseHeaders(500, -1); // 500 Internal Server Error
         }
     }
+
+    private void handleAlterQuantity(HttpExchange exchange, String id) throws IOException {
+        Connection conn = null;
+        PreparedStatement lockStmt = null;
+        PreparedStatement updateStmt = null;
+        ResultSet lockResult = null;
+
+        try {
+            // Read and parse the request body
+            String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+            JSONObject json = new JSONObject(body);
+
+            if (!json.has("delta_quantity")) {
+                exchange.sendResponseHeaders(409, -1); // Conflict
+                return;
+            }
+
+            int delta_quantity = json.getInt("delta_quantity");
+
+            // Update the existing record in the database
+            String lockQuery = DAO.lockItem(id);
+            String updateQuery = DAO.alterQuantity(id, delta_quantity);
+
+            conn = DoConnection.getConnection();
+
+            // Lock the row for update
+            lockStmt = conn.prepareStatement(lockQuery);
+            lockResult = lockStmt.executeQuery();
+
+            // Test for concurrent requests
+            /*try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }*/
+
+            if (lockResult.next()) {
+                // Check if the current quantity allows the operation
+                int currentQuantity = lockResult.getInt("quantity_in_stock");
+                if (currentQuantity >= -delta_quantity) {
+                    // Update the quantity
+                    updateStmt = conn.prepareStatement(updateQuery);
+
+                    try {
+                        updateStmt.executeUpdate();
+                    } catch (SQLException e) {
+                        if(e.getMessage().contains("violates check constraint")){
+                            exchange.sendResponseHeaders(409, -1); // Conflict
+                        }
+                        return;
+                    }
+
+                    exchange.sendResponseHeaders(202, -1); // 202 Accepted
+                } else {
+                    // Not enough items in stock
+                    exchange.sendResponseHeaders(409, -1); // 409 Conflict
+                }
+            } else {
+                exchange.sendResponseHeaders(404, -1); // 404 Not Found
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            exchange.sendResponseHeaders(500, -1); // 500 Internal Server Error
+        }
+    }
+
+
 
     // Delete item
     private void handleDelete(HttpExchange exchange, String id) throws IOException {
