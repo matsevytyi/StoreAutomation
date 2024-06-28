@@ -9,8 +9,13 @@ module StoreAutomation {
     requires java.net.http;
 
     exports client.app;
+    exports client.interface_adapter.root;
+    exports client.interface_adapter.category;
+    exports client.interface_adapter.item;
 
     opens client.app to javafx.fxml;
-    exports client.api;
-    opens client.api to javafx.fxml;
+
+    opens client.interface_adapter.item to javafx.fxml;
+    opens client.interface_adapter.category to javafx.fxml;
+    opens client.interface_adapter.root to javafx.fxml;
 }
