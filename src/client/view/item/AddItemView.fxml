@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<Pane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.interface_adapter.item.AddItemController">
+    <children>
+        <Button fx:id="saveButton" layoutX="74.0" layoutY="336.0" mnemonicParsing="false" onAction="#handleSave" prefHeight="26.0" prefWidth="90.0" text="Save" />
+        <TextField fx:id="nameText" layoutX="74.0" layoutY="89.0" prefHeight="26.0" prefWidth="435.0" text="Name" />
+        <TextArea fx:id="descriptionText" layoutX="74.0" layoutY="131.0" prefHeight="58.0" prefWidth="435.0" text="Description" />
+        <Button fx:id="cancelButton" layoutX="198.0" layoutY="336.0" mnemonicParsing="false" onAction="#handleCancel" prefHeight="26.0" prefWidth="90.0" text="Close" />
+        <Label layoutX="241.0" layoutY="34.0" style="-fx-font-size: 25; font-style: bold" text="Add Item" />
+        <TextField fx:id="ManufacturerText" layoutX="74.0" layoutY="206.0" prefHeight="26.0" prefWidth="435.0" text="Manufacturer" />
+        <TextField fx:id="PricePerUnitText" layoutX="74.0" layoutY="249.0" prefHeight="26.0" prefWidth="435.0" text="Price per unit" />
+      <TextField fx:id="CategoryText" layoutX="74.0" layoutY="293.0" prefHeight="26.0" prefWidth="435.0" text="Category" />
+    </children>
+</Pane>
