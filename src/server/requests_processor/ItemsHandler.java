@@ -259,6 +259,7 @@ public class ItemsHandler implements HttpHandler {
     }
 
     private void handleAlterQuantity(HttpExchange exchange, String id) throws IOException {
+        //service -> update quantity
         Connection conn = null;
         PreparedStatement lockStmt = null;
         PreparedStatement updateStmt = null;
