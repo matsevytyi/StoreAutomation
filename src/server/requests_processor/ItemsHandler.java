@@ -47,26 +47,24 @@ public class ItemsHandler implements HttpHandler {
 
         switch (method) {
             case "GET":
-                //handle get items list
-                if(id.equals("items")){
-                    handleGetList(exchange);
-                    System.out.println("GET " + id);
-                    break;
-                }
-                //handle get particular item
-                else {
-                    System.out.println("GET " + id);
-                    handleGetItem(exchange, id);
-                    break;
-                }
+                System.out.println("GET " + id);
+                handleGetItem(exchange, id);
+                break;
             case "PUT":
                 System.out.println("PUT " + id);
                 handlePut(exchange);
                 break;
             case "POST":
+                System.out.println(path);
                 System.out.println("POST " + id);
                 if(path.contains("altquantity"))
                     handleAlterQuantity(exchange, id);
+                //handle get items list
+                else if(id.equals("items")){
+                    handleGetList(exchange);
+                    System.out.println("GET " + id);
+                    break;
+                }
                 else
                     handlePost(exchange, id);
                 break;
@@ -84,7 +82,9 @@ public class ItemsHandler implements HttpHandler {
         try {
 
             String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+            System.out.println(body);
             JSONObject json = new JSONObject(body);
+            System.out.println(json);
             String query;
 
             if(!json.has("category_id")){
@@ -92,14 +92,10 @@ public class ItemsHandler implements HttpHandler {
                 return;
             }
 
-            if(json.has("name_part"))
-                query = DAO.searchItem(json.getString("name_part"), json.getInt("category_id"));
-            else if (json.has("min_price") && json.has("max_price"))
-
-                query = DAO.filterByPrice(json.getDouble("min_price"), json.getDouble("max_price"), json.getInt("category_id"));
+            if(json.has("name_part") && json.has("min_price") && json.has("max_price"))
+                query = DAO.searchItem(json.getString("name_part"), json.getDouble("min_price"), json.getDouble("max_price"), json.getInt("category_id"));
             else {
-                exchange.sendResponseHeaders(400, -1); // 400 Bad Request
-                return;
+                query = DAO.searchItem(json.getString(""), 0, Double.MAX_VALUE, json.getInt("category_id"));
             }
 
             ResultSet resultSet = DoConnection

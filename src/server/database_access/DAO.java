@@ -18,12 +18,25 @@ public interface DAO {
         return "DELETE FROM public.items WHERE id = '" + id + "'";
     }
 
-    public static String searchItem(String name, Integer category_id) {
-        StringBuilder query = new StringBuilder("SELECT id, name, group_id FROM public.items WHERE name LIKE ?");
+    public static String searchItem(String name, double min_price, double max_price, Integer category_id) {
+        String query = "SELECT id, name, group_id FROM public.items WHERE 1=1";
 
-        if (category_id != null) {
-            query.append(" AND group_id = ?");
+        if(category_id != -1) {
+            query += " AND group_id = '" + category_id + "'";
         }
+
+        if(name != "-1") {
+            query += " AND name LIKE '%" + name + "%'";
+        }
+
+        if (min_price > 0 && max_price > 0) {
+            query += " AND price_per_unit BETWEEN '" + min_price + "' AND '" + max_price + "'";
+        }
+
+        System.out.println(query);
+
+
+
 
         return query.toString();
     }
@@ -38,10 +51,6 @@ public interface DAO {
 
     public static String updateItem(String id, String name, String description, String manufacturer, double price_per_unit) {
         return "UPDATE public.items SET name = '" + name + "', description = '" + description + "', manufacturer = '" + manufacturer + "', price_per_unit = '" + price_per_unit + "' WHERE id = '" + id + "'";
-    }
-
-    public static String filterByPrice(double minPrice, double maxPrice, int group_id) {
-        return "SELECT id, name, group_id FROM public.items WHERE price_per_unit >= '" + minPrice + "' AND price_per_unit <= '" + maxPrice + "' AND group_id = '" + group_id + "'";
     }
 
     static String lockItem(String id) {
@@ -74,7 +83,9 @@ public interface DAO {
         return "DELETE FROM public.categories WHERE id = '" + id + "'";
     }
 
-
+    public static String getFullStatistics() {
+        return "SELECT c.name AS name, SUM(i.quantity_in_stock) AS total_items_amount, SUM(i.price_per_unit * i.quantity_in_stock) AS total_price FROM categories c LEFT JOIN items i ON c.id = i.group_id GROUP BY c.name;";
+    }
 
 
     // unpack items operations
@@ -144,4 +155,26 @@ public interface DAO {
         }
         return jsonArray;
     }
+
+    //Statistics
+
+
+    public static JSONArray unpackStatisticsList(ResultSet resultSet) {
+        JSONArray jsonArray = new JSONArray();
+
+        try {
+            while (resultSet.next()) {
+                JSONObject jsonCategory = new JSONObject();
+                jsonCategory.put("name", resultSet.getString("name"));
+                jsonCategory.put("total_price", resultSet.getDouble("total_price"));
+                jsonCategory.put("total_items_amount", resultSet.getInt("total_items_amount"));
+                jsonArray.put(jsonCategory);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        System.out.println(jsonArray);
+        return jsonArray;
+    }
+
 }

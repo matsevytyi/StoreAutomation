@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<Pane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.interface_adapter.item.ManageItemController">
+   <children>
+      <Button fx:id="editButton" layoutX="288.0" layoutY="248.0" mnemonicParsing="false" onAction="#handleEdit" prefHeight="26.0" prefWidth="90.0" text="Update" />
+      <TextField fx:id="nameText" layoutX="72.0" layoutY="89.0" prefHeight="26.0" prefWidth="294.0" text="Name" />
+      <TextArea fx:id="descriptionText" layoutX="74.0" layoutY="131.0" prefHeight="58.0" prefWidth="294.0" text="Description" />
+      <Button fx:id="cancelButton" layoutX="388.0" layoutY="206.0" mnemonicParsing="false" onAction="#handleCancel" prefHeight="26.0" prefWidth="90.0" text="Close" />
+      <Label layoutX="220.0" layoutY="35.0" style="-fx-font-size: 25; font-style: bold" text="Manage Item" />
+      <Button fx:id="deleteButton" layoutX="388.0" layoutY="248.0" mnemonicParsing="false" onAction="#handleDelete" prefHeight="26.0" prefWidth="90.0" text="Delete" />
+      <Button fx:id="IncreaseQuantityButton" layoutX="286.0" layoutY="307.0" mnemonicParsing="false" onAction="#increaseQuantityClicked" prefHeight="26.0" prefWidth="90.0" text="Increase" />
+      <TextField fx:id="ManufacturerText" layoutX="74.0" layoutY="206.0" prefHeight="26.0" prefWidth="294.0" text="Manufacturer" />
+      <TextField fx:id="PricePerUnitText" layoutX="74.0" layoutY="248.0" prefHeight="26.0" prefWidth="192.0" text="Price per unit" />
+      <TextField fx:id="AlterQuantityText" layoutX="74.0" layoutY="307.0" prefHeight="26.0" prefWidth="167.0" text="Quantity" />
+      <Button fx:id="DecreaseQuantityButton" layoutX="388.0" layoutY="307.0" mnemonicParsing="false" onAction="#decreaseQuantityClicked" prefHeight="26.0" prefWidth="90.0" text="Decrease" />
+   </children>
+</Pane>

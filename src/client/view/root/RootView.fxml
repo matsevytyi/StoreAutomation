@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<TabPane id="rootPane" prefHeight="400" prefWidth="600" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.interface_adapter.root.MainScreenController">
+    <tabs>
+        <Tab text="Categories">
+            <content>
+                <AnchorPane prefHeight="168.0" prefWidth="600">
+               <children>
+                   <Button fx:id="createCategoryButton" layoutX="478.0" layoutY="14.0" mnemonicParsing="false" onAction="#handleCreateCategory" prefHeight="26.0" prefWidth="108.0" text="Create Category" />
+                  <Button fx:id="reloadCategoriesButton" layoutX="358.0" layoutY="14.0" mnemonicParsing="false" onAction="#handleReload" prefHeight="26.0" prefWidth="108.0" text="Reload" />
+                  <ListView fx:id="categoryListView" layoutX="8.0" layoutY="51.0" prefHeight="317.0" prefWidth="585.0" style="-fx-font-size: 25.0" />
+               </children>
+                </AnchorPane>
+            </content>
+        </Tab>
+        <Tab text="Items">
+            <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                    <children>
+                        <TextField fx:id="itemSearchField" layoutX="77.0" layoutY="14.0" prefHeight="26.0" prefWidth="417.0" />
+                        <Button fx:id="filterItemButton" layoutX="77.0" layoutY="80.0" mnemonicParsing="false" onAction="#handleFilterItem" prefHeight="26.0" prefWidth="108.0" text="Apply filters" />
+                        <Button fx:id="reloadItemsButton" layoutX="193.0" layoutY="80.0" mnemonicParsing="false" onAction="#handleReload" prefHeight="26.0" prefWidth="108.0" text="Refresh" />
+                        <ListView fx:id="itemListView" layoutX="8.0" layoutY="115.0" prefHeight="303.0" prefWidth="585.0" style="-fx-font-size: 15.0" />
+                        <TextField fx:id="minPriceFilterField" layoutX="77.0" layoutY="46.0" prefHeight="26.0" prefWidth="125.0" />
+                        <TextField fx:id="maxPriceFilterField" layoutX="211.0" layoutY="46.0" prefHeight="26.0" prefWidth="125.0" />
+                        <ChoiceBox fx:id="categoryFilterChoiceBox" layoutX="344.0" layoutY="46.0" prefWidth="150.0" />
+                    </children>
+                </AnchorPane>
+            </content>
+        </Tab>
+        <Tab text="Statistics">
+            <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                    <Button fx:id="reloadStatsButton" layoutX="374.0" layoutY="14.0" mnemonicParsing="false" onAction="#handleReload" prefHeight="26.0" prefWidth="108.0" text="Refresh" />
+                    <children>
+                   <TableView fx:id="tableView" layoutY="47.0" prefHeight="322.0" prefWidth="600.0">
+                       <columns>
+                           <TableColumn fx:id="categoryColumn" prefWidth="339.0" text="Category" />
+                           <TableColumn fx:id="totalPriceColumn" prefWidth="128.0" text="Total price" />
+                           <TableColumn fx:id="totalGoodsColumn" prefWidth="132.0" text="Total goods" />
+                       </columns>
+                   </TableView>
+               </children></AnchorPane>
+            </content>
+        </Tab>
+    </tabs>
+</TabPane>

@@ -53,6 +53,11 @@ public class CategoriesHandler implements HttpHandler {
                     System.out.println("GET " + id);
                     break;
                 }
+                else if (id.equals("statistics")){
+                    handleGetStatistics(exchange);
+                    System.out.println("GET " + id);
+                    break;
+                }
                 //handle get particular categories
                 else {
                     System.out.println("GET " + id);
@@ -137,6 +142,37 @@ public class CategoriesHandler implements HttpHandler {
             exchange.sendResponseHeaders(500, -1); // 500 Internal Server Error
         }
     }
+
+    private void handleGetStatistics(HttpExchange exchange) throws IOException {
+        try {
+            String query = DAO.getFullStatistics();
+
+
+            ResultSet resultSet = DoConnection
+                    .getConnection()
+                    .prepareStatement(query)
+                    .executeQuery();
+
+            JSONArray response = DAO.unpackStatisticsList(resultSet);
+
+            if (response != null) {
+
+                byte[] bytes = response.toString().getBytes(StandardCharsets.UTF_8);
+
+                exchange.getResponseHeaders().set("Content-Type", "application/json");
+                exchange.sendResponseHeaders(200, bytes.length);
+                OutputStream os = exchange.getResponseBody();
+                os.write(bytes);
+                os.close();
+            } else {
+                exchange.sendResponseHeaders(404, -1); // 404 Not Found
+            }
+
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+            exchange.sendResponseHeaders(500, -1); // 500 Internal Server Error
+        }}
 
     // Add item
     private void handlePut(HttpExchange exchange) throws IOException {
@@ -254,4 +290,6 @@ public class CategoriesHandler implements HttpHandler {
             return false;
         }
     }
+
+
 }

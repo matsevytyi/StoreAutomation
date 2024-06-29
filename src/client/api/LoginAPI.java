@@ -22,6 +22,9 @@ public class LoginAPI {
         if(loginResponse.statusCode() == 401){
             return "bad login";
         }
+        System.out.println(loginResponse.statusCode());
+        System.out.println(loginResponse.body());
+
 
         JSONObject resultJson = new JSONObject(loginResponse.body());
 

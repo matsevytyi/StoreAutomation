@@ -13,11 +13,7 @@ public class Category {
     private String description;
 
     public String toString() {
-        return "Category{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                '}';
+        return name;
     }
 
     public int getId() {

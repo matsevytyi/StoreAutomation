@@ -15,7 +15,7 @@ public class DisplayItem {
     }
 
     public String toString() {
-        return "Displayable Item: " + name + " " + group_id;
+        return name;
     }
 
     public int getId() {

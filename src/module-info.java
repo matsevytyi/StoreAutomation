@@ -18,4 +18,5 @@ module StoreAutomation {
     opens client.interface_adapter.item to javafx.fxml;
     opens client.interface_adapter.category to javafx.fxml;
     opens client.interface_adapter.root to javafx.fxml;
+    opens client.entities to javafx.base;
 }
